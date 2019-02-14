@@ -1,0 +1,21 @@
+{
+  "name": "phaser",
+  "version": "1.0.0",
+  "description": "Learning Phaser",
+  "private": true,
+  "dependencies": {
+    "phaser": "^3.16.2"
+  },
+  "devDependencies": {
+    "http-server": "^0.11.1",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3"
+  },
+  "scripts": {
+    "build": "mkdir -p dist && cp -r public/* dist && webpack",
+    "serve": "http-server dist",
+    "reload": "npm run build && npm run serve",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bemo"
+}
