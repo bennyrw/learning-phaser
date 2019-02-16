@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "noImplicitAny": false,
+    "strict": false,
+    "module": "es6",
+    "target": "es5",
+    "jsx": "react",
+    "allowJs": true,
+    "sourceMap": true
+  },
+  "files": [
+    "node_modules/phaser3-docs/typescript/phaser.d.ts"
+  ]
+}

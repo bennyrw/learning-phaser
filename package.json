@@ -7,14 +7,17 @@
     "phaser": "^3.16.2"
   },
   "devDependencies": {
-    "http-server": "^0.11.1",
+    "phaser3-docs": "github:photonstorm/phaser3-docs",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.3.3",
     "webpack": "^4.29.3",
-    "webpack-cli": "^3.2.3"
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.1.14"
   },
   "scripts": {
-    "build": "mkdir -p dist && cp -r public/* dist && webpack",
-    "serve": "http-server dist",
-    "reload": "npm run build && npm run serve",
+    "dev": "webpack --mode development && webpack-dev-server --mode development",
+    "build": "webpack --mode production",
+    "build-serve": "npm run build && webpack-dev-server --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Bemo"
