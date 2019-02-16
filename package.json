@@ -9,6 +9,7 @@
   "devDependencies": {
     "phaser3-docs": "github:photonstorm/phaser3-docs",
     "ts-loader": "^5.3.3",
+    "tslint": "^5.12.1",
     "typescript": "^3.3.3",
     "webpack": "^4.29.3",
     "webpack-cli": "^3.2.3",
@@ -18,6 +19,7 @@
     "dev": "webpack --mode development && webpack-dev-server --mode development",
     "build": "webpack --mode production",
     "build-serve": "npm run build && webpack-dev-server --mode production",
+    "lint": "tslint -p tslint.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Bemo"

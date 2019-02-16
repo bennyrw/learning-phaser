@@ -1,33 +1,28 @@
 /// <reference path='../node_modules/phaser3-docs/typescript/phaser.d.ts'/>
 import 'phaser';
 
-var config: GameConfig = {
+const config: GameConfig = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: {y: 200}
-        }
+            gravity: {y: 200},
+        },
     },
     scene: {
         preload: preload,
-        create: create
-    }
+        create: create,
+    },
 };
 
-export class Game extends Phaser.Game {
-    constructor(config: GameConfig) {
-        super(config);
-    }
-}
-
 window.addEventListener("load", () => {
-    var game = new Game(config);
+    /* tslint:disable-next-line no-unused-expression */
+    new Phaser.Game(config);
 });
 
-function preload ()  {
+function preload()  {
     this.load.setBaseURL('http://labs.phaser.io');
 
     this.load.image('sky', 'assets/skies/space3.png');
@@ -35,18 +30,18 @@ function preload ()  {
     this.load.image('red', 'assets/particles/red.png');
 }
 
-function create () {
+function create() {
     this.add.image(400, 300, 'sky');
 
-    var particles = this.add.particles('red');
+    const particles = this.add.particles('red');
 
-    var emitter = particles.createEmitter({
+    const emitter = particles.createEmitter({
         speed: 100,
         scale: { start: 1, end: 0 },
-        blendMode: 'ADD'
+        blendMode: 'ADD',
     });
 
-    var logo = this.physics.add.image(400, 100, 'logo');
+    const logo = this.physics.add.image(400, 100, 'logo');
 
     logo.setVelocity(100, 200);
     logo.setBounce(1, 1);
