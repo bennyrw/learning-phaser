@@ -1,8 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="dist/bundle.js"></script>
+    <link href="spinner.css" rel="stylesheet" type="text/css">
+    <script type="application/javascript">
+        function removeSpinner() {
+            var spinner = document.getElementsByClassName('spinner')[0];
+            spinner.parentElement.removeChild(spinner);
+        }
+    </script>
+    <script defer src="dist/bundle.js" onload="removeSpinner()"></script>
 </head>
 <body>
+<div class="spinner">
+    <div class="rect1"></div>
+    <div class="rect2"></div>
+    <div class="rect3"></div>
+    <div class="rect4"></div>
+    <div class="rect5"></div>
+</div>
 </body>
 </html>
