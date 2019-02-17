@@ -196,6 +196,15 @@ function collectStar(player, star) {
     state.score += 10;
     state.scoreText.setText('Score: ' + state.score);
 
+    // use a tween to temporarily grow the player
+    this.tweens.add({
+        targets: state.player, // on the player
+        duration: 200, // for 200ms
+        scaleX: 1.2, // that scale vertically by 20%
+        scaleY: 1.2, // and scale horizontally by 20%
+        yoyo: true, // at the end, go back to original scale
+    });
+
     // when all the stars are collected re-enable all the stars and release a bomb
     if (state.stars.countActive(true) === 0) {
         state.stars.children.iterate((child) => {
@@ -220,4 +229,6 @@ function hitBomb(player, bomb) {
     player.anims.play('turn');
 
     this.state.gameOver = true;
+
+    this.cameras.main.fadeOut(6000, 255);
 }
