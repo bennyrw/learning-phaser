@@ -1,10 +1,13 @@
 /// <reference path='../node_modules/phaser3-docs/typescript/phaser.d.ts'/>
 import 'phaser';
 
+const WIDTH: number = 800;
+const HEIGHT: number = 600;
+
 const config: GameConfig = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: WIDTH,
+    height: HEIGHT,
     physics: {
         default: 'arcade',
         arcade: {
@@ -30,7 +33,26 @@ class State {
 window.addEventListener("load", () => {
     /* tslint:disable-next-line no-unused-expression */
     new Phaser.Game(config);
+    resize();
 });
+
+function resize() {
+    const canvas = document.querySelector("canvas");
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const windowRatio = windowWidth / windowHeight;
+    const gameRatio = WIDTH / HEIGHT;
+
+    if (windowRatio < gameRatio) {
+        canvas.style.width = windowWidth + "px";
+        canvas.style.height = (windowWidth / gameRatio) + "px";
+    } else {
+        canvas.style.width = (windowHeight * gameRatio) + "px";
+        canvas.style.height = windowHeight + "px";
+    }
+}
+
+window.addEventListener('resize', () => resize());
 
 function preload() {
     this.load.image('sky', 'assets/sky.png');
