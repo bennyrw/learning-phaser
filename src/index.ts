@@ -4,6 +4,22 @@ import 'phaser';
 const WIDTH: number = 800;
 const HEIGHT: number = 600;
 
+const bootScene = {
+    key: 'loader',
+    active: true,
+    preload: bootPreload,
+    create: bootCreate,
+};
+
+const gameScene = {
+    key: 'game',
+    active: false,
+    visible: false,
+    preload: preload,
+    create: create,
+    update: update,
+};
+
 const config: GameConfig = {
     type: Phaser.AUTO,
     width: WIDTH,
@@ -15,12 +31,19 @@ const config: GameConfig = {
             gravity: {y: 200},
         },
     },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update,
-    },
+    scene: [bootScene, gameScene],
 };
+
+function bootPreload() {
+    this.load.image('loader', 'assets/sky.png');
+}
+
+function bootCreate() {
+    this.add.image(0, 0, 'loader').setOrigin(0);
+    this.add.text(16, 16, 'Loading...', { fontSize: '32px', fill: '#000' });
+
+    this.scene.launch('game');
+}
 
 class State {
     public player: Phaser.Physics.Arcade.Sprite;
