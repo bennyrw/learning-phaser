@@ -18,6 +18,15 @@ const config: GameConfig = {
     },
 };
 
+class State {
+    public player: Phaser.Physics.Arcade.Sprite;
+    public score: number = 0;
+    public scoreText: Phaser.GameObjects.Text;
+    public stars: any; // Phaser.Physics.Arcade.StaticGroup;
+    public bombs: Phaser.Physics.Arcade.StaticGroup;
+    public gameOver: boolean = false;
+}
+
 window.addEventListener("load", () => {
     /* tslint:disable-next-line no-unused-expression */
     new Phaser.Game(config);
@@ -34,15 +43,12 @@ function preload() {
     );
     this.load.image('white', 'assets/white.png');
 
-    this.player = null;
-    this.score = 0;
-    this.scoreText = null;
-    this.stars = null;
-    this.bombs = null;
-    this.gameOver = false;
+    this.state = new State();
 }
 
 function create() {
+    const state: State = this.state;
+
     // position at center by default
     // this.add.image(400, 300, 'sky');
     // or by setting origin manually
@@ -63,15 +69,15 @@ function create() {
     // player
 
     // physics.add... creates a dynamic physics 'body' by default
-    this.player = this.physics.add.sprite(100, 450, 'dude');
-    this.player.setBounce(0.2);
-    this.player.setCollideWorldBounds(true);
+    state.player = this.physics.add.sprite(100, 450, 'dude');
+    state.player.setBounce(0.2);
+    state.player.setCollideWorldBounds(true);
 
     // higher value = quicker fall
-    this.player.body.setGravityY(300);
+    state.player.setGravityY(300);
 
     // colliders can take optional callbacks, but we don't need this against platforms
-    this.physics.add.collider(this.player, platforms);
+    this.physics.add.collider(state.player, platforms);
 
     this.anims.create({
         key: 'left',
@@ -104,75 +110,78 @@ function create() {
 
     // stars
 
-    this.stars = this.physics.add.group({
+    state.stars = this.physics.add.group({
         key: 'star',
         repeat: 11, // group has 1 item in by default, so repeating 11 times gives 12 items in total
         setXY: { x: 12, y: 0, stepX: 70 },
     });
 
-    this.stars.children.iterate((child) => {
+    state.stars.children.iterate((child) => {
         child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
     });
 
-    this.physics.add.collider(this.stars, platforms);
+    this.physics.add.collider(state.stars, platforms);
 
-    this.physics.add.overlap(this.player, this.stars, collectStar, null, this);
+    this.physics.add.overlap(state.player, state.stars, collectStar, null, this);
 
     // score
 
-    this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+    state.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
 
     // bombs (baddies)
 
-    this.bombs = this.physics.add.group();
+    state.bombs = this.physics.add.group();
 
-    this.physics.add.collider(this.bombs, platforms);
+    this.physics.add.collider(state.bombs, platforms);
 
-    this.physics.add.collider(this.player, this.bombs, hitBomb, null, this);
+    this.physics.add.collider(state.player, state.bombs, hitBomb, null, this);
 }
 
 function update() {
+    const state: State = this.state;
     const cursors = this.input.keyboard.createCursorKeys();
     if (cursors.left.isDown) {
-        this.player.setVelocityX(-160);
+        state.player.setVelocityX(-160);
 
-        this.player.anims.play('left', true);
+        state.player.anims.play('left', true);
     } else if (cursors.right.isDown) {
-        this.player.setVelocityX(160);
+        state.player.setVelocityX(160);
 
-        this.player.anims.play('right', true);
+        state.player.anims.play('right', true);
     } else {
-        this.player.setVelocityX(0);
+        state.player.setVelocityX(0);
 
-        this.player.anims.play('turn');
+        state.player.anims.play('turn');
     }
 
     if (cursors.up.isDown) {
-        if (this.player.body.touching.down) {
-            this.player.setVelocityY(-330);
+        if (state.player.body.touching.down) {
+            state.player.setVelocityY(-330);
         } else {
             // mid-air (ideally would only fire first time in mid-air)
-            this.player.setVelocityY(-165);
+            state.player.setVelocityY(-165);
         }
     }
 }
 
 function collectStar(player, star) {
+    const state: State = this.state;
+
     // star's physics body is disabled and its parent game object is made inactive & invisible
     star.disableBody(true, true);
 
-    this.score += 10;
-    this.scoreText.setText('Score: ' + this.score);
+    state.score += 10;
+    state.scoreText.setText('Score: ' + state.score);
 
     // when all the stars are collected re-enable all the stars and release a bomb
-    if (this.stars.countActive(true) === 0) {
-        this.stars.children.iterate((child) => {
+    if (state.stars.countActive(true) === 0) {
+        state.stars.children.iterate((child) => {
             child.enableBody(true, child.x, 0, true, true);
         });
 
         const x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
 
-        const bomb = this.bombs.create(x, 16, 'bomb');
+        const bomb = state.bombs.create(x, 16, 'bomb');
         bomb.setBounce(1);
         bomb.setCollideWorldBounds(true);
         bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
@@ -187,5 +196,5 @@ function hitBomb(player, bomb) {
 
     player.anims.play('turn');
 
-    this.gameOver = true;
+    this.state.gameOver = true;
 }
