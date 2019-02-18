@@ -99,6 +99,19 @@ class State {
     public gameOver: boolean = false;
 }
 
+/* tslint:disable-next-line max-classes-per-file */
+class Sfx {
+    public blaster: Phaser.Sound.BaseSound;
+    public explode: Phaser.Sound.BaseSound;
+    public background: Phaser.Sound.BaseSound;
+
+    public constructor(game) {
+        game.load.audio('blaster', 'assets/blaster.mp3');
+        game.load.audio('explode', 'assets/explosion.mp3');
+        game.load.audio('background', 'assets/oedipus_ark_pandora.mp3');
+    }
+}
+
 window.addEventListener("load", () => {
     /* tslint:disable-next-line no-unused-expression */
     new Phaser.Game(config);
@@ -135,6 +148,7 @@ function preload() {
     this.load.image('white', 'assets/white.png');
 
     this.state = new State();
+    this.sfx = new Sfx(this);
 }
 
 function create() {
@@ -226,6 +240,21 @@ function create() {
     this.physics.add.collider(state.bombs, platforms);
 
     this.physics.add.collider(state.player, state.bombs, hitBomb, null, this);
+
+    // sounds
+
+    this.sfx.blaster = this.sound.add('blaster');
+    this.sfx.explode = this.sound.add('explode');
+
+    this.sfx.background = this.sound.add('background', {loop: true});
+    this.sfx.background.volume = 0.2;
+    this.sfx.background.play();
+
+    //  Being mp3 files these take time to decode, so we can't play them instantly
+    //  Using setDecodedCallback we can be notified when they're ALL ready for use.
+    //  The audio files could decode in ANY order, we can never be sure which it'll be.
+
+    // this.sound.setDecodedCallback([ state.blaster ], () => { console.log('sound ready') }, this);
 }
 
 function update() {
@@ -257,6 +286,8 @@ function update() {
 
 function collectStar(player, star) {
     const state: State = this.state;
+
+    this.sfx.blaster.play();
 
     // star's physics body is disabled and its parent game object is made inactive & invisible
     star.disableBody(true, true);
@@ -291,6 +322,8 @@ function collectStar(player, star) {
 // pause game and turn player red :(
 function hitBomb(player, bomb) {
     this.physics.pause();
+
+    this.sfx.explode.play();
 
     player.setTint(0xff0000);
 
