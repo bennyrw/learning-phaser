@@ -33,6 +33,7 @@ const config: GameConfig = {
     physics: {
         default: 'arcade',
         arcade: {
+            debug: true,
             gravity: {y: 200},
         },
     },
@@ -87,6 +88,7 @@ function bootUpdate(time) {
     if (time > 2 * LOADING_FADE_DURATION && !isGameSceneLaunched) {
         isGameSceneLaunched = true;
         this.scene.launch('game');
+        this.scene.remove('loader');
     }
 }
 
@@ -139,6 +141,7 @@ window.addEventListener('resize', () => resize());
 function preload() {
     this.load.image('sky', 'assets/sky.png');
     this.load.image('ground', 'assets/platform.png');
+    this.load.image('ground90', 'assets/platform90.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude',
@@ -157,19 +160,45 @@ function create() {
     // position at center by default
     // this.add.image(400, 300, 'sky');
     // or by setting origin manually
-    this.add.image(0, 0, 'sky').setOrigin(0, 0);
+
+    // tile the sky so it fills the background
+    for (let x = 0; x < 2; ++x) {
+        for (let y = 0; y < 2; ++y) {
+            this.add.image(x * 800, y * 600, 'sky').setOrigin(0, 0);
+        }
+    }
 
     // platforms
 
     // a group of static physics objects - i.e. can't move, not affected by forces
     const platforms = this.physics.add.staticGroup();
 
+    // ground
     // refresh needed after scale to tell the physics world about the change
-    platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    platforms.create(800, 1100, 'ground').setScale(4).refreshBody();
 
+    // individual platforms
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
+
+    platforms.create(1200, 220, 'ground');
+    platforms.create(1200, 400, 'ground');
+    platforms.create(100, 900, 'ground');
+    platforms.create(400, 950, 'ground');
+
+    // rotated 90 degrees
+    // not supported with Arcade physics so have to hack it by updating body (eek!) haven't got it perfect
+    const hackedPlatform = platforms.create(800, 700, 'ground').setOrigin(0, 0);
+    hackedPlatform.setAngle(90);
+    const temp = hackedPlatform.body.width;
+    hackedPlatform.body.width = hackedPlatform.body.height;
+    hackedPlatform.body.height = temp;
+    hackedPlatform.body.x = hackedPlatform.x;
+    hackedPlatform.body.y = hackedPlatform.y;
+
+    // or the simple way - use a rotated image (!) not ideal, waste of download, but will this work?
+    platforms.create(100, 700, 'ground90');
 
     // player
 
@@ -212,6 +241,15 @@ function create() {
         blendMode: 'ADD',
     });
     emitter.startFollow(player);*/
+
+    // camera & world
+
+    this.physics.world.setBounds(0, 0, 1600, 1200);
+    this.cameras.main.setBounds(0, 0, 1600, 1200);
+    this.cameras.main.startFollow(state.player, true);
+
+    // don't scroll within 50px of edge
+    this.cameras.main.setDeadzone(50, 50);
 
     // stars
 
@@ -335,6 +373,9 @@ function addBomb() {
 // pause game and turn player red :(
 function hitBomb(player, bomb) {
     this.physics.pause();
+
+    // zoom in over a couple of seconds
+    this.cameras.main.zoomTo(4, 2000);
 
     this.sfx.explode.play();
 
