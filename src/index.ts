@@ -241,6 +241,14 @@ function create() {
 
     this.physics.add.collider(state.player, state.bombs, hitBomb, null, this);
 
+    // add a bomb every 10 seconds (mean!)
+    this.time.addEvent({
+        delay: 5000,
+        loop: true,
+        callback: addBomb,
+        callbackScope: this,
+    });
+
     // sounds
 
     this.sfx.blaster = this.sound.add('blaster');
@@ -310,13 +318,18 @@ function collectStar(player, star) {
             child.enableBody(true, child.x, 0, true, true);
         });
 
-        const x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        const bomb = state.bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        addBomb();
     }
+}
+
+function addBomb() {
+    const state = this.state;
+    const x = (state.player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+    const bomb = state.bombs.create(x, 16, 'bomb');
+    bomb.setBounce(1);
+    bomb.setCollideWorldBounds(true);
+    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
 }
 
 // pause game and turn player red :(
