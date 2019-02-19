@@ -356,7 +356,7 @@ function collectStar(player, star) {
             child.enableBody(true, child.x, 0, true, true);
         });
 
-        addBomb();
+        addBomb.call(this);
     }
 }
 
