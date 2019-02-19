@@ -1,10 +1,9 @@
 /// <reference path='../node_modules/phaser3-docs/typescript/phaser.d.ts'/>
 import 'phaser';
 
-const WIDTH: number = 800;
-const HEIGHT: number = 600;
-
-const LOADING_FADE_DURATION: number = 2000;
+import {BootScene} from "./BootScene";
+import {HEIGHT, WIDTH} from "./config";
+import {TextButton} from "./TextButton";
 
 let isGameSceneLaunched = false;
 
@@ -47,61 +46,8 @@ const config: GameConfig = {
         },
     },
     // hud rendered after game to ensure controls are visible
-    scene: [bootScene, gameScene, hudScene],
+    scene: [BootScene, gameScene, hudScene],
 };
-
-function bootPreload() {
-    this.load.image('block', 'assets/50x50.png');
-}
-
-function bootCreate() {
-    const blockSize: number = 50;
-    const blocksWide: number = 14;
-    const blocksTall: number = 10;
-    const totalBlocks: number = blocksWide * blocksTall;
-    const blocks = this.add.group({ key: 'block', repeat: totalBlocks - 1, setScale: { x: 0, y: 0 } });
-
-    Phaser.Actions.GridAlign(blocks.getChildren(), {
-        width: blocksWide,
-        cellWidth: blockSize,
-        cellHeight: blockSize,
-        x: (WIDTH - blocksWide * blockSize) / 2,
-        y: (HEIGHT - blocksTall * blockSize) / 2,
-    });
-
-    const interColumnDelay: number = 50;
-    let column: number = 0;
-    blocks.children.iterate((child) => {
-        this.tweens.add({
-            targets: child,
-            scaleX: 1,
-            scaleY: 1,
-            angle: 180,
-            _ease: 'Sine.easeInOut',
-            ease: 'Power2',
-            duration: LOADING_FADE_DURATION,
-            delay: column * interColumnDelay,
-            // repeat: -1,
-            // yoyo: true,
-            // hold: 1000,
-            // repeatDelay: 1000,
-        });
-
-        column++;
-        if (column % 14 === 0) {
-            column = 0;
-        }
-    });
-}
-
-function bootUpdate(time) {
-    if (time > 2 * LOADING_FADE_DURATION && !isGameSceneLaunched) {
-        isGameSceneLaunched = true;
-        this.scene.launch('game');
-        this.scene.launch('hud');
-        this.scene.remove('loader');
-    }
-}
 
 class State {
     public player: Phaser.Physics.Arcade.Sprite;
