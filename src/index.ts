@@ -25,6 +25,15 @@ const gameScene = {
     update: update,
 };
 
+const hudScene = {
+    key: 'hud',
+    active: false,
+    visible: false,
+    preload: hudPreload,
+    create: hudCreate,
+    update: hudUpdate,
+};
+
 const config: GameConfig = {
     type: Phaser.AUTO,
     width: WIDTH,
@@ -37,7 +46,8 @@ const config: GameConfig = {
             gravity: {y: 200},
         },
     },
-    scene: [bootScene, gameScene],
+    // hud rendered after game to ensure controls are visible
+    scene: [bootScene, gameScene, hudScene],
 };
 
 function bootPreload() {
@@ -88,6 +98,7 @@ function bootUpdate(time) {
     if (time > 2 * LOADING_FADE_DURATION && !isGameSceneLaunched) {
         isGameSceneLaunched = true;
         this.scene.launch('game');
+        this.scene.launch('hud');
         this.scene.remove('loader');
     }
 }
@@ -301,6 +312,12 @@ function create() {
     //  The audio files could decode in ANY order, we can never be sure which it'll be.
 
     // this.sound.setDecodedCallback([ state.blaster ], () => { console.log('sound ready') }, this);
+
+    // sound controls
+
+    const button = new TextButton(this, 100, 400, '123', { fill: '#0f0'}, () => {
+        // todo - do something
+    });
 }
 
 function update() {
@@ -328,6 +345,21 @@ function update() {
             state.player.setVelocityY(-165);
         }
     }
+}
+
+function hudPreload() {
+    this.load.image('pause', 'assets/pause.png');
+}
+
+function hudCreate() {
+    const pause = this.add.sprite(760, 40, 'pause').setScale(0.25).setInteractive({ useHandCursor: true });
+    pause.on('pointerdown', () => {
+        // todo - pause
+    });
+}
+
+function hudUpdate() {
+    // ?
 }
 
 function collectStar(player, star) {
